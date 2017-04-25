@@ -1,0 +1,7 @@
+name: Hub
+version: ${project.version}
+main: me.mc_elmo.hub.Hub
+prefix: [HUB]
+authors: [MC_Elmo]
+description: Custom Coded Hub Plugin by MC_Elmo
+website: www.github.com/MC_Elmo
