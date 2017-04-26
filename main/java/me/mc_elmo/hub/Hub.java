@@ -1,5 +1,6 @@
 package me.mc_elmo.hub;
 
+import me.mc_elmo.hub.listeners.PlayerJoin;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -13,6 +14,7 @@ import java.util.logging.Logger;
 public class Hub extends JavaPlugin
 {
     private Hub instance;
+    private PlayerJoin playerJoin;
     private PluginManager pluginManager;
     private ScoreboardManager scoreboardManager;
     private Logger logger;
@@ -22,6 +24,7 @@ public class Hub extends JavaPlugin
     {
         this.logger = Bukkit.getLogger();
         this.instance = this;
+        this.playerJoin = new PlayerJoin(instance);
         this.pluginManager = getServer().getPluginManager();
         this.scoreboardManager = getServer().getScoreboardManager();
         registerEvents();
@@ -31,6 +34,7 @@ public class Hub extends JavaPlugin
 
     private void registerListeners()
     {
+        pluginManager.registerEvents(playerJoin, instance);
 
     }
 
