@@ -24,8 +24,17 @@ public class PlayerJoin implements Listener
     @EventHandler
     public void onJoin(PlayerJoinEvent e)
     {
+        //Send player join message in form of title
         Player player = e.getPlayer();
-        ChatUtil.sendTitle(player, config.getString("Join.Title"), config.getString("Join.subTitle"),
-                config.getInt("Join.fadeIn"), config.getInt("Join.stay"),config.getInt("Join.fadeOut"));
+        try
+        {
+            ChatUtil.sendTitle(player, config.getString("Join.Title"), config.getString("Join.subTitle"),
+                    config.getInt("Join.fadeIn"), config.getInt("Join.stay"), config.getInt("Join.fadeOut"));
+        }catch (NullPointerException ex)
+        {
+            instance.getLogger().warning("Unable to get Join Title info, message did not send.");
+        }
+
+
     }
 }

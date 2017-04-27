@@ -1,0 +1,12 @@
+Jedis:
+   host: 'localhost'
+   port: 6379
+   timeout: 5000
+   password: ''
+
+Join:
+   Title: 'Welcome %player ,'
+   subTitle: 'This server is custom coded by MC_Elmo'
+   fadeIn: 20
+   stay: 60
+   fadeOut: 20
