@@ -1,92 +1,95 @@
 package me.mc_elmo.hub;
 
+import me.mc_elmo.hub.listeners.HubManagementListeners;
 import me.mc_elmo.hub.listeners.PlayerJoin;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.ScoreboardManager;
-import redis.clients.jedis.Jedis;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.logging.Logger;
 
-/**
- * Created by Elom on 4/24/17.
- */
-public class Hub extends JavaPlugin
-{
+public class Hub
+        extends JavaPlugin {
     private Hub instance;
-
-    private Jedis jedis;
-
+    private Connection connection;
     private PlayerJoin playerJoin;
-
     private PluginManager pluginManager;
     private ScoreboardManager scoreboardManager;
     private Logger logger;
     private FileConfiguration config;
+
     @Override
-    public void onEnable()
-    {
+    public void onEnable() {
         this.logger = Bukkit.getLogger();
-
-            this.config = getConfig();
-            config.options().copyDefaults(true);
-            saveDefaultConfig();
-
+        this.config = this.getConfig();
+        this.config.options().copyDefaults(true);
+        this.saveDefaultConfig();
         this.instance = this;
-        this.playerJoin = new PlayerJoin(instance);
-        this.pluginManager = getServer().getPluginManager();
-        this.scoreboardManager = getServer().getScoreboardManager();
-        registerEvents();
-        registerListeners();
-        registerCommands();
-        jedis();
+        this.sql();
+        this.playerJoin = new PlayerJoin(this.instance);
+        this.pluginManager = this.getServer().getPluginManager();
+        this.scoreboardManager = this.getServer().getScoreboardManager();
+        this.registerEvents();
+        this.registerListeners();
+        this.registerCommands();
+        Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> {
+                    for (World world : Bukkit.getServer().getWorlds()) {
+                        world.setTime(0);
+                        this.getLogger().info("Time change");
+                    }
+                }
+                , 0, 100);
     }
 
-    private void jedis()
-    {
-        jedis = new Jedis(config.getString("Jedis.host" , "localhsot"), config.getInt("Jedis.port", 6379), config.getInt("Jedis.timeout" , 5000));
-
-        if(config.getString("Jedis.password") != null)
-            jedis.auth(config.getString("Jedis.password"));
-
-
+    private void registerListeners() {
+        this.pluginManager.registerEvents(this.playerJoin, this.instance);
+        this.pluginManager.registerEvents(new HubManagementListeners(), this);
     }
 
-    private void registerListeners()
-    {
-        pluginManager.registerEvents(playerJoin, instance);
-
+    private void registerEvents() {
     }
 
-    private void registerEvents()
-    {
+    public Connection getConnection() {
+        return this.connection;
     }
 
-
-    private void registerCommands()
-    {
-
+    private void registerCommands() {
     }
 
-    public Jedis getJedis()
-    {
-        return jedis;
+    public Logger getPluginLogger() {
+        return this.logger;
     }
 
-    public Logger getPluginLogger()
-    {
-        return logger;
+    private void sql() {
+        this.establishConnection();
+    }
+
+    private void establishConnection() {
+        String hostname = this.config.getString("SQL.host", "localhost");
+        String port = this.config.getString("SQL.port", "3306");
+        String databaseName = this.config.getString("SQL.database", "default");
+        String user = this.config.getString("SQL.user", "root");
+        String password = this.config.getString("SQL.auth", "");
+        String connectionStr = "jdbc:mysql://" + hostname + ":" + port + "/" + databaseName;
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            this.connection = DriverManager.getConnection(connectionStr, user, password);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void onDisable()
-    {
-        instance = null;
-        pluginManager = null;
-        scoreboardManager = null;
-        logger = null;
-        jedis.close();
+    public void onDisable() {
+        this.instance = null;
+        this.pluginManager = null;
+        this.scoreboardManager = null;
+        this.logger = null;
     }
 }

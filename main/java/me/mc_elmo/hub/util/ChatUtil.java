@@ -8,13 +8,11 @@ import org.bukkit.entity.Player;
  */
 public class ChatUtil
 {
-    //Translate '&' to Chat Color
     public static String format(String msg)
     {
         return ChatColor.translateAlternateColorCodes('&',msg);
     }
 
-    //Format the title message
     public static void sendTitle(Player player, String title, String subTitle, int fadeIn, int stay, int fadeOut)
     {
         player.sendTitle(format(title), format(subTitle), fadeIn, stay, fadeOut);

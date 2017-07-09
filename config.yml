@@ -1,0 +1,14 @@
+SQL:
+   host: 'localhost'
+   database: 'dev_server'
+   port: 3306
+   timeout: 5000
+   user: 'root'
+   auth: ''
+
+Join:
+   Title: '&6Welcome %player ,'
+   subTitle: 'This server is custom coded by MC_Elmo'
+   fadeIn: 20
+   stay: 120
+   fadeOut: 40

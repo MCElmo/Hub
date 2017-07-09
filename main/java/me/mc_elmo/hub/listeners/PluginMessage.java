@@ -11,108 +11,90 @@ import org.bukkit.plugin.messaging.PluginMessageListener;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Elom on 4/26/17.
- */
-public class PluginMessage implements PluginMessageListener
-{
+public class PluginMessage
+        implements PluginMessageListener {
     private Hub instance;
     private ByteArrayDataInput in;
     private ByteArrayDataOutput out;
     private String bungeeChannel;
-    public PluginMessage(Hub instance)
-    {
+
+    public PluginMessage(Hub instance) {
         this.instance = instance;
-
         this.bungeeChannel = "BungeeCord";
-        instance.getServer().getMessenger().registerOutgoingPluginChannel(instance, bungeeChannel);
-        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, bungeeChannel, this);
+        instance.getServer().getMessenger().registerOutgoingPluginChannel(instance, this.bungeeChannel);
+        instance.getServer().getMessenger().registerIncomingPluginChannel(instance, this.bungeeChannel, this);
     }
-
 
     @Override
-    public void onPluginMessageReceived(String channel, Player player, byte[] message)
-    {
-        if(!(channel.equals(bungeeChannel)))
+    public void onPluginMessageReceived(String channel, Player player, byte[] message) {
+        if (!channel.equals(this.bungeeChannel)) {
             return;
-
-        in = ByteStreams.newDataInput(message);
-
+        }
+        this.in = ByteStreams.newDataInput(message);
     }
 
-    public void connectPlayer(Player sender, String server)
-    {
-        out = ByteStreams.newDataOutput();
-        out.writeUTF("Connect");
-        out.writeUTF(server);
-        sender.sendPluginMessage(instance, bungeeChannel, out.toByteArray());
+    public void connectPlayer(Player sender, String server) {
+        this.out = ByteStreams.newDataOutput();
+        this.out.writeUTF("Connect");
+        this.out.writeUTF(server);
+        sender.sendPluginMessage(this.instance, this.bungeeChannel, this.out.toByteArray());
     }
 
-    public void connectTarget(Player sender, Player target,  String server)
-    {
-        out = ByteStreams.newDataOutput();
-        out.writeUTF("ConnectOther");
-        out.writeUTF(target.getDisplayName());
-        out.writeUTF(server);
-        sender.sendPluginMessage(instance, bungeeChannel, out.toByteArray());
+    public void connectTarget(Player sender, Player target, String server) {
+        this.out = ByteStreams.newDataOutput();
+        this.out.writeUTF("ConnectOther");
+        this.out.writeUTF(target.getDisplayName());
+        this.out.writeUTF(server);
+        sender.sendPluginMessage(this.instance, this.bungeeChannel, this.out.toByteArray());
     }
 
-    public String ip(Player target)
-    {
-        out.writeUTF("IP");
-        target.sendPluginMessage(instance, bungeeChannel , out.toByteArray());
-        String ip = in.readUTF();
-        int port = in.readInt();
+    public String ip(Player target) {
+        this.out.writeUTF("IP");
+        target.sendPluginMessage(this.instance, this.bungeeChannel, this.out.toByteArray());
+        String ip = this.in.readUTF();
+        int port = this.in.readInt();
         return ip + ":" + port;
     }
 
-    public int playerCount(Player sender, String server)
-    {
-       out.writeUTF("PlayerCount");
-       out.writeUTF(server);
-        sender.sendPluginMessage(instance, bungeeChannel, out.toByteArray());
-       in.readUTF(); //Name of server is returned back
-       return in.readInt(); //playercount
-
+    public int playerCount(Player sender, String server) {
+        this.out.writeUTF("PlayerCount");
+        this.out.writeUTF(server);
+        sender.sendPluginMessage(this.instance, this.bungeeChannel, this.out.toByteArray());
+        this.in.readUTF();
+        return this.in.readInt();
     }
 
-    public List<Player> playerList(Player sender, String server)
-    {
-        out.writeUTF("PlayerList");
-        out.writeUTF(server);
-        sender.sendPluginMessage(instance, bungeeChannel, out.toByteArray());
-        in.readUTF(); //Name of server is returned back
-        String[] playerListString = in.readUTF().split(",");
-        List<Player> playerList= new ArrayList<Player>();
-        for(String playerName : playerListString)
-        {
+    public List<Player> playerList(Player sender, String server) {
+        this.out.writeUTF("PlayerList");
+        this.out.writeUTF(server);
+        sender.sendPluginMessage(this.instance, this.bungeeChannel, this.out.toByteArray());
+        this.in.readUTF();
+        String[] playerListString = this.in.readUTF().split(",");
+        ArrayList<Player> playerList = new ArrayList<Player>();
+        for (String playerName : playerListString) {
             playerList.add(Bukkit.getPlayerExact(playerName));
         }
         return playerList;
     }
 
-    public void message(Player sender, Player target,  String message)
-    {
-        out = ByteStreams.newDataOutput();
-        out.writeUTF("Message");
-        out.writeUTF(target.getDisplayName());
-        out.writeUTF(message);
-        sender.sendPluginMessage(instance, bungeeChannel, out.toByteArray());
+    public void message(Player sender, Player target, String message) {
+        this.out = ByteStreams.newDataOutput();
+        this.out.writeUTF("Message");
+        this.out.writeUTF(target.getDisplayName());
+        this.out.writeUTF(message);
+        sender.sendPluginMessage(this.instance, this.bungeeChannel, this.out.toByteArray());
     }
 
-    public String getServer(Player target)
-    {
-        out.writeUTF("GetServer");
-        target.sendPluginMessage(instance, bungeeChannel, out.toByteArray());
-        return in.readUTF();
-    }
-    public String getUUID(Player target)
-    {
-        out.writeUTF("UUIDOther");
-        out.writeUTF(target.getDisplayName());
-        in.readUTF();
-        return in.readUTF();
+    public String getServer(Player target) {
+        this.out.writeUTF("GetServer");
+        target.sendPluginMessage(this.instance, this.bungeeChannel, this.out.toByteArray());
+        return this.in.readUTF();
     }
 
-
+    public String getUUID(Player target) {
+        this.out.writeUTF("UUIDOther");
+        this.out.writeUTF(target.getDisplayName());
+        this.in.readUTF();
+        return this.in.readUTF();
+    }
 }
